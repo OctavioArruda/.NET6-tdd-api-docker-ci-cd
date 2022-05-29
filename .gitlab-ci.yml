@@ -1,0 +1,9 @@
+image: microsoft/dotnet:latest
+
+stages:
+  - build
+  - test
+
+# Should build both the api and the test project; dotnet restore and dotnet build
+# Should run the unit tests
+# Should curl to the api and search for a ok result
