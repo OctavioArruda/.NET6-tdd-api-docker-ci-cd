@@ -15,3 +15,11 @@ dotnet api conteinerized with docker and with ci/cd
 ## Postgres
 - User: postgres
 - Password: postgres
+
+
+### TODO-LIST:
+- [ ] Change Users.Common to a classlib
+- [ ] Create a nuget package from the class lib
+- [ ] Add redis on the program (using docker)
+- [ ] Add rabbitmq on the program (using docker)
+- [ ] Add postgres on the program (using docker)

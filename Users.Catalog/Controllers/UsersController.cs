@@ -7,6 +7,12 @@ namespace Users.Catalog.Controllers;
 [Route("users")]
 public class UsersController : ControllerBase
 {
+    [HttpGet("health")]
+    public string HealthCheck()
+    {
+        return "UP";
+    }
+
     [HttpGet]
     public ActionResult<IEnumerable<UserDto>> Get()
     {

@@ -11,13 +11,16 @@ namespace Users.Catalog.UnitTests.Controllers
     public class UsersControllerTests
     {
         private readonly UsersController _userController;
+
+        private const string API_UP = "UP";
+
         public UsersControllerTests()
         {
             _userController = new UsersController();
         }
 
         [Fact]
-        public void Get_WhenCalled_ShouldReturnOk()
+        public void Get_WhenCalled_ShouldNotBeNull()
         {
             // Arrange
 
@@ -27,6 +30,18 @@ namespace Users.Catalog.UnitTests.Controllers
             // Assert
             result.Should().BeOfType<ActionResult<IEnumerable<UserDto>>>();
             result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void HealthCheck_WhenCalled_ShoulReturnUp()
+        {
+            // Arrange
+
+            // Act
+            var result = _userController.HealthCheck();
+
+            // Assert
+            result.Should().Be(API_UP);
         }
     }
 }

@@ -9,12 +9,19 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// debug purposes = swagger on pdn
+app.UseSwagger();
+app.UseSwaggerUI();
+
+// // Configure the HTTP request pipeline.
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI();
+//     // app.UseSwaggerUI(options => {
+//     //     options.SwaggerEndpoint("/swagger/v1/users.json", "v1");
+//     // });
+// }
 
 app.UseHttpsRedirection();
 

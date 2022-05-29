@@ -1,9 +1,80 @@
-image: microsoft/dotnet:latest
+image: mcr.microsoft.com/dotnet/sdk:6.0
 
 stages:
   - build
-  - test
+  - unit-tests
+  - build-docker-image
+  - smoke-test
+  - integration-tests
 
-# Should build both the api and the test project; dotnet restore and dotnet build
-# Should run the unit tests
-# Should curl to the api and search for a ok result
+# Restore packages and build the application
+build:
+  stage: build
+  script:
+    - cd ./Users.Catalog/
+    - dotnet restore
+    - dotnet build
+    - cd ../Users.Catalog.UnitTests
+    - dotnet restore
+    - dotnet build
+
+# Runs unit tests
+unit-tests:
+  stage: unit-tests
+  script:
+    - cd ./Users.Catalog.UnitTests
+    - dotnet test
+
+# Build the api docker image and generate swagger
+build-docker-image:
+  stage: build-docker-image
+  image: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker info
+    - docker --version
+  script:
+    - cd ./Users.Catalog/
+    - docker build -t dockerapi .
+    - docker run -d -p 8080:80 --name users-api dockerapi
+    - apk add curl
+    - touch swagger.json
+    - curl docker:8080/swagger/v1/swagger.json > $CI_PROJECT_DIR/swagger.json
+  artifacts:
+    paths:
+      - swagger.json
+
+# From the docker container, do a health check
+smoke-test:
+  image: docker
+  stage: smoke-test
+  services:
+    - docker:dind
+  before_script:
+    - docker info
+    - docker --version
+  script:
+    - cd ./Users.Catalog/
+    - docker build -t dockerapi .
+    - docker run -d -p 8080:80 --name users-api dockerapi
+    - apk add curl
+    - sleep 15
+    - curl docker:8080/users/health | tac | tac | grep -q "UP"
+
+# # TODO: Complete newman integration tests from swagger, currently not working
+integration-tests:
+  dependencies:
+    - build-docker-image
+  image: 
+    name: postman/newman:alpine
+    entrypoint: [""]
+  stage: integration-tests
+  script:
+    - newman --version
+    - touch report.html
+    - npm install -g newman-reporter-html
+    - newman run $CI_PROJECT_DIR/swagger.json --reporters cli,html --reporter-html-export $CI_PROJECT_DIR/report.html
+  artifacts:
+    paths:
+      - report.html
